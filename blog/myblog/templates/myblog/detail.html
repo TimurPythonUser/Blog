@@ -1,0 +1,50 @@
+{% extends 'myblog/base.html' %}
+
+{% block content %}
+<h3>{{post.title}}</h3>
+<h3>Автор публикации: {{post.author}}</h3>
+<h6>{{post.time_create}}</h6>
+
+{% if post.picture %}
+<p><img src="{{ post.picture.url }}" class="img-fluid rounded-start" width="200"></p>
+{% endif %}
+
+{{post.content|linebreaks}}
+<hr>
+{% if request.user.is_authenticated %}
+<form action="{% url 'like_post' post.pk %}" method="post">
+    {% csrf_token %}
+    {% if liked %}
+    <button type="submit" name="post_id" value="{{post.id}}" class='btn btn-danger btn-sm'>
+        Не понравилось</button>
+    {% else %}
+    <button type="submit" name="post_id" value="{{post.id}}" class='btn btn-primary btn-sm'>
+        Понравилось</button>
+
+    {% endif %}
+    - {{likes}}
+</form>
+{% endif %}
+<hr>
+{% if request.user.is_authenticated %}
+<form action='' method="POST">
+    {% csrf_token %}
+    <table>
+        {{ form2.as_table }}
+    </table>
+    <input class='btn btn-dark' type="submit" value="Добавить комментарий">
+</form>
+{% else %}
+<h3>Чтобы оставлять комментарии - <a class="btn btn-dark align-items-left"  href="{% url 'register' %}">Зарегестрируйтесь</a>
+или <a class="btn btn-dark align-items-left" href="{% url 'login' %}">Войдите</a></h3>
+{% endif %}
+<hr>
+<h3>Комментарии:</h3><br>
+{% for c in comms %}
+<h6>Пользователь - {{c.author}}</h6>
+<h6>Добавлено: {{c.time_create}}</h6>
+<h4>{{c.text}}</h4><br>
+<hr>
+{% endfor %}
+
+{% endblock %}
